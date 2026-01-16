@@ -252,6 +252,63 @@ drop desag_superficie_ind
 label var desag_superficie_hog "Desagüe: a la superficie"
 tab desag_superficie_hog, m
 
+*******************
+* Primera variación: desague desagregado en copartido o no compartido
+*******************
+cap drop desag_alcantarillado_hog_v desag_septica_hog_v desag_pozo_ciego_hog_v desag_superficie_hog_v
+
+* Combinando las dos preguntas
+gen baño_exclusivo = v15_servsan == 1 if !missing(v15_servsan)
+gen baño_compartido = v15_servsan == 2 if !missing(v15_servsan)
+gen sin_baño = v15_servsan == 3 if !missing(v15_servsan)
+
+* Red de alcantarillado
+cap drop red_exclusivo
+gen red_exclusivo = v16_desague == 1 & baño_exclusivo==1
+tab red_exclusivo,m
+
+cap drop red_compartido
+gen red_compartido = v16_desague == 1 & baño_compartido==1
+tab red_compartido,m
+
+* Cámara séptica
+cap drop septica_exclusivo
+gen septica_exclusivo = v16_desague == 2 & baño_exclusivo==1
+tab septica_exclusivo,m
+
+cap drop septica_compartido
+gen septica_compartido = v16_desague == 2 & baño_compartido==1
+tab septica_compartido,m
+
+* Pozo ciego 
+cap drop pozo_ciego_exclusivo
+gen pozo_ciego_exclusivo = v16_desague == 3 & baño_exclusivo==1
+tab pozo_ciego_exclusivo,m
+
+cap drop  pozo_ciego_compartido
+gen pozo_ciego_compartido = v16_desague == 3 & baño_compartido==1
+tab pozo_ciego_compartido,m
+
+* Superficie 
+cap drop superficie_exclusivo
+gen superficie_exclusivo = inlist(v16_desague,4,5) & baño_exclusivo==1
+tab superficie_exclusivo,m
+
+cap drop superficie_compartido
+gen superficie_compartido = inlist(v16_desague,4,5) & baño_compartido==1
+tab superficie_compartido,m
+	// quite el baño ecológico
+
+*******************
+* Segunda variación: saneamiento mejorado
+*******************
+cap drop saneamiento_mejorado 
+gen saneamiento_mejorado = .
+replace saneamiento_mejorado = 0 if inlist(v16_desague,1,6) & urbrur==1
+replace saneamiento_mejorado = 0 if inlist(v16_desague,1,2,3,4,6) & urbrur==2
+replace saneamiento_mejorado = 1 if saneamiento_mejorado==.
+tab saneamiento_mejorado,m 
+
 
 * --- 7) ELECTRICIDAD ---
 * 1=Red, 2=Generador, 3=Solar 
@@ -526,6 +583,7 @@ keep i00 w_quintil
 duplicates drop  
 save "$out\viviendas_unicas_2024.dta", replace
 restore 
+
 
 
 
