@@ -283,6 +283,18 @@ drop agua_rio_ind
 label var agua_rio_hog "Agua: Río/vertiente/acequia (dummy)"
 tab agua_rio_hog, m
 
+**************
+* Primera variación: Agua mejorada
+**************
+
+* Agua mejorada
+cap drop agua_mejorada
+gen agua_mejorada = .
+replace agua_mejorada = 0 if inlist(P07,3,4,5,6,7) & URBRUR==1
+replace agua_mejorada = 0 if inlist(P07,3,5,6,7) & URBRUR==2
+replace agua_mejorada = 1 if inlist(P07,1,2) & URBRUR==1
+replace agua_mejorada = 1 if inlist(P07,1,2,4) & URBRUR==2
+tab agua_mejorada,m
 
 *========================================================
 * 5) SANEAMIENTO: P09_SERVSANIT
@@ -336,6 +348,67 @@ bys I_BC_VIV: egen desag_superficie_hog = max(desag_superficie_ind)
 drop desag_superficie_ind
 label var desag_superficie_hog "Desagüe: a la superficie (4-6) (dummy)"
 tab desag_superficie_hog, m
+
+*******************
+* Primera variación: desague desagregado en copartido o no compartido
+*******************
+tab P10_DESAGUE,m	// con missings, ya que los individuos no cuentan con servicio sanitario, baño o letrina 
+tab P09_SERVSANIT,m
+
+gen baño_exclusivo = P09_SERVSANIT == 1 if !missing(P09_SERVSANIT)
+gen baño_compartido = P09_SERVSANIT == 2 if !missing(P09_SERVSANIT)
+gen sin_baño = P09_SERVSANIT == 3 if !missing(P09_SERVSANIT)
+
+ 
+ * Red de alcantarillado
+cap drop red_exclusivo
+gen red_exclusivo = P10_DESAGUE == 1 & baño_exclusivo==1
+tab red_exclusivo,m
+
+cap drop red_compartido
+gen red_compartido = P10_DESAGUE == 1 & baño_compartido==1
+tab red_compartido,m
+
+* Cámara séptica
+cap drop septica_exclusivo
+gen septica_exclusivo = P10_DESAGUE == 2 & baño_exclusivo==1
+tab septica_exclusivo,m
+
+cap drop septica_compartido
+gen septica_compartido = P10_DESAGUE == 2 & baño_compartido==1
+tab septica_compartido,m
+
+* Pozo ciego 
+cap drop pozo_ciego_exclusivo
+gen pozo_ciego_exclusivo = P10_DESAGUE == 3 & baño_exclusivo==1
+tab pozo_ciego_exclusivo,m
+
+cap drop  pozo_ciego_compartido
+gen pozo_ciego_compartido = P10_DESAGUE == 3 & baño_compartido==1
+tab pozo_ciego_compartido,m
+
+* Superficie 
+cap drop superficie_exclusivo
+gen superficie_exclusivo = inlist(P10_DESAGUE,4,5,6) & baño_exclusivo==1
+tab superficie_exclusivo,m
+
+cap drop superficie_compartido
+gen superficie_compartido = inlist(P10_DESAGUE,4,5,6) & baño_compartido==1
+tab superficie_compartido,m
+
+
+*******************
+* Segunda variación: saneamiento mejorado
+*******************
+
+cap drop saneamiento_mejorado 
+gen saneamiento_mejorado = .
+replace saneamiento_mejorado = 1 if saneamiento==.
+replace saneamiento_mejorado = 1 if inlist(P10_DESAGUE,2,3,4,5,6) & URBRUR==1
+replace saneamiento_mejorado = 1 if inlist(P10_DESAGUE,4,5,6) & URBRUR==2
+replace saneamiento_mejorado = 0 if inlist(P10_DESAGUE,1) & URBRUR==1
+replace saneamiento_mejorado = 0 if inlist(P10_DESAGUE,1,2,3) & URBRUR==2
+tab saneamiento_mejorado,m
 
 
 *========================================================
@@ -646,4 +719,5 @@ duplicates drop
 save "$out\viviendas_unicas_2012.dta", replace
 
 restore 
+
 
