@@ -560,7 +560,7 @@ tab ayuda_dom_viv, m
 *******************************************************************************
 * NORMALIZACIÓN DE VARIABLES GEOGRÁFICAS 
 *******************************************************************************
-foreach v in imun idep iprov urbrur i00 {
+foreach v in imun idep iprov urbrur mun_res_cod i00 {
     capture confirm numeric variable `v'
     if _rc destring `v', replace ignore(" ")
 }
@@ -581,7 +581,7 @@ collapse (max) ///
     comb_gas_hog comb_elec_hog comb_solar_hog comb_lena_hog comb_guano_hog ///
     radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog carreta_hog bote_hog cocina_hog ///
     vivprop_hog ayuda_dom_viv hacin_viv ///
-    idep iprov imun urbrur ///
+    idep iprov imun urbrur mun_res_cod ///
     , by(i00)
 
 compress
@@ -627,7 +627,7 @@ save "$out\hogar_2024_wealth_con_pca.dta", replace
 
 * --- 1. Quintiles Municipales ---
 preserve
-collapse (mean) mean_wealth=wealth_z (count) hogares=wealth_z, by(codigo municipal?)
+collapse (mean) mean_wealth=wealth_z (count) hogares=wealth_z, by(mun_res_cod)
 
 xtile quintil_mun_mean = mean_wealth, nq(5)
 label values quintil_mun_mean q5
@@ -643,3 +643,4 @@ keep i00 w_quintil
 duplicates drop  
 save "$out\viviendas_unicas_2024.dta", replace
 restore 
+
