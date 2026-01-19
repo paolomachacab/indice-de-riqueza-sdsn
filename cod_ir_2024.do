@@ -644,3 +644,107 @@ duplicates drop
 save "$out\viviendas_unicas_2024.dta", replace
 restore 
 
+********************************************************************************
+* 1. PREPARACIÓN Y COLAPSO (CRUCIAL: CONTAR MIEMBROS)
+********************************************************************************
+
+* Generamos una variable auxiliar para contar personas antes de colapsar
+gen uno = 1 
+
+preserve
+
+collapse (max) ///
+    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_cemento_hog piso_mos_cer_hog piso_ladrillo_hog ///
+    techo1_hog techo2_hog techo3_hog techo4_hog ///
+    pared1_hog pared2_hog pared3_hog pared4_hog pared5_hog pared6_hog ///
+    agua_red_hog agua_pileta_hog agua_aguatero_hog agua_pozobomba_hog agua_pozosin_hog agua_rio_hog ///
+    sanit1_hog sanit2_hog ///
+    desag_alcantarillado_hog desag_septica_hog desag_pozo_ciego_hog desag_superficie_hog ///
+    elec1_hog elec2_hog elec3_hog ///
+    comb_gas_hog comb_elec_hog comb_solar_hog comb_lena_hog comb_guano_hog ///
+    radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog carreta_hog bote_hog cocina_hog ///
+    vivprop_hog ayuda_dom_viv hacin_viv ///
+    (first) idep iprov imun urbrur mun_res_cod ///
+    (sum) tot_miembros=uno /// <--- ESTO ES NUEVO: Cuenta personas por hogar (i00)
+    , by(i00)
+
+compress
+save "$out\hogar_2024_wealth_base.dta", replace
+
+********************************************************************************
+* 2. PCA (ÍNDICE DE RIQUEZA)
+********************************************************************************
+
+global wealth_vars ///
+    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_cemento_hog piso_mos_cer_hog piso_ladrillo_hog ///
+    techo1_hog techo2_hog techo3_hog techo4_hog ///
+    pared1_hog pared2_hog pared3_hog pared4_hog pared5_hog pared6_hog ///
+    agua_red_hog agua_pileta_hog agua_aguatero_hog agua_pozobomba_hog agua_pozosin_hog agua_rio_hog ///
+    sanit1_hog sanit2_hog ///
+    desag_alcantarillado_hog desag_septica_hog desag_pozo_ciego_hog desag_superficie_hog ///
+    elec1_hog elec2_hog elec3_hog ///
+    comb_gas_hog comb_elec_hog comb_solar_hog comb_lena_hog comb_guano_hog ///
+    radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog carreta_hog bote_hog cocina_hog ///
+    vivprop_hog ayuda_dom_viv hacin_viv
+
+* PCA (Agregado 'corr' por seguridad estándar)
+pca $wealth_vars, corr
+
+* Score y Estandarización
+cap drop wealth_score wealth_z
+predict wealth_score if e(sample), score
+egen wealth_z = std(wealth_score)
+
+********************************************************************************
+* 3. CÁLCULO DE LOS DOS TIPOS DE QUINTILES
+********************************************************************************
+label define q5 1 "Q1 (Más pobre)" 2 "Q2" 3 "Q3" 4 "Q4" 5 "Q5 (Más rico)", replace
+
+* --- A. Quintil Poblacional (El estándar DHS/BM/Censo) ---
+* Ponderado por [fw=tot_pers]. El 20% de la GENTE está en cada grupo.
+cap drop w_quintil_pers
+xtile w_quintil_pers = wealth_z [fw=tot_pers], nq(5)
+label values w_quintil_pers q5
+label var w_quintil_pers "Quintil de Riqueza 2024 (Poblacional)"
+
+* --- B. Quintil Hogares ---
+cap drop w_quintil_hog
+xtile w_quintil_hog = wealth_z, nq(5)
+label values w_quintil_hog q5
+label var w_quintil_hog "Quintil de Riqueza 2024 (Hogares)"
+
+save "$out\hogar_2024_wealth_con_pca.dta", replace
+
+********************************************************************************
+* 4. EXPORTAR RESULTADOS MUNICIPALES
+********************************************************************************
+
+* --- Opción 1: Ranking Municipal basado en la Población ---
+preserve
+* Usamos [iw=tot_pers] para que el promedio refleje la riqueza de la gente del municipio
+collapse (mean) mean_wealth=wealth_z (count) poblacion=wealth_z [iw=tot_pers], by(mun_res_cod)
+
+xtile quintil_mun_pob = mean_wealth, nq(5)
+label values quintil_mun_pob q5
+label var quintil_mun_pob "Quintil Municipal (Basado en Población)"
+
+save "$out\wealth_municipal_poblacion_2024.dta", replace
+restore
+
+* --- Opción 2: Ranking Municipal basado en Hogares ---
+preserve
+collapse (mean) mean_wealth=wealth_z (count) hogares=wealth_z, by(mun_res_cod)
+
+xtile quintil_mun_hog = mean_wealth, nq(5)
+label values quintil_mun_hog q5
+label var quintil_mun_hog "Quintil Municipal (Basado en Hogares)"
+
+save "$out\wealth_municipal_hogares_2024.dta", replace
+restore
+
+* --- 3. Base nivel vivienda ---
+preserve
+keep i00 w_quintil_pers w_quintil_hog
+duplicates drop  
+save "$out\viviendas_unicas_2024.dta", replace
+restore
