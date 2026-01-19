@@ -474,6 +474,17 @@ label var comb_guano_hog "Combustible: guano/bosta/taquia (dummy)"
 tab comb_guano_hog, m
 
 
+*Combustible limpio para cocinar:
+
+gen comb_limpio_ind = .
+replace comb_limpio_ind = 1 if inlist(P12_COMBUS,1,2,3,4)
+replace comb_limpio_ind = 0 if !missing(P12_COMBUS) & !inlist(P12_COMBUS,1,2,3,4)
+bys I_BC_VIV: egen comb_limpio_hog = max(comb_limpio_ind)
+drop comb_limpio_ind
+label var comb_limpio_hog "Combustible limpio para cocinar (dummy)"
+tab comb_limpio_hog, m
+
+
 
 *========================================================
 * 9) BIENES 
@@ -719,5 +730,6 @@ duplicates drop
 save "$out\viviendas_unicas_2012.dta", replace
 
 restore 
+
 
 
