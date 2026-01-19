@@ -45,13 +45,13 @@ Los insumos provienen únicamente de los operativos oficiales publicados por el 
 * **[Censo de Población y Vivienda 2012](https://anda.ine.gob.bo/index.php/catalog/8)**
 * **[Censo de Población y Vivienda 2024](https://anda.ine.gob.bo/index.php/catalog/132)**
 
-> **Nota de filtro:** Para garantizar la comparabilidad, la base de datos se filtró únicamente para **viviendas particulares** en ambos periodos.
+> **NOTA:** Para garantizar la comparabilidad, la base de datos se filtró únicamente para **viviendas particulares** en ambos periodos.
 
 ---
 
 ## Variables utilizadas en el Índice de Riqueza
 
-> **AVISO IMPORTANTE:** Las variables enumeradas a continuación son las seleccionadas preliminarmente para el modelo. **No representan la lista final**, ya que están sujetas a pruebas de varianza y consistencia estadística durante la fase de validación del PCA.
+> **NOTA:** Las variables enumeradas a continuación son las seleccionadas preliminarmente para el modelo. **No representan la lista final**, ya que están sujetas a pruebas de varianza y consistencia estadística durante la fase de validación del PCA.
 
 ### Calidad de la vivienda
 - Material del piso
