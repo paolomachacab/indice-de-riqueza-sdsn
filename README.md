@@ -4,11 +4,13 @@ Este repositorio contiene los **datos de salida** y el **código reproducible (S
 
 La construcción sigue la lógica del **[DHS Wealth Index](https://dhsprogram.com/topics/wealth-index/Index.cfm)**, que utiliza **Análisis de Componentes Principales (PCA)** sobre un conjunto de variables de activos y condiciones de vivienda para aproximar el **estatus económico** del hogar (no ingreso ni consumo).
 
-### Contenido del Repositorio
+Esta metodología se basa en las directrices de Rutstein (2008, 2015), adaptadas a información censal.
 
-* **Código reproducible:** Archivos .do de Stata para el procesamiento y cálculo del índice.
-* **Quintiles de riqueza:** Bases de datos con la estratificación socioeconómica resultante.
-* **Datos municipales:** Resultados del índice agregados a nivel geográfico municipal.
+El índice permite:
+- Medir el nivel socioeconómico estructural de los hogares.
+- Clasificar hogares en quintiles de riqueza.
+- Agregar resultados a nivel municipal.
+
 
 ---
 
@@ -20,57 +22,64 @@ Este proyecto fue desarrollado y probado en **[Stata 17](https://www.stata.com/s
 
 ## Metodología
 
-El índice se construye con PCA aplicado a variables de activos y características del hogar. El flujo general (estilo DHS) es:
+El índice se construye mediante **Análisis de Componentes Principales (PCA)** aplicado a variables que capturan condiciones materiales y activos del hogar.
 
-1. Selección de variables que reflejen bienestar material (vivienda, servicios, activos, etc.).
-2. Transformación a indicadores (principalmente dummies) y armonización para que **2012 y 2024** queden con **los mismos nombres finales** de variables.
-3. Consolidación a nivel hogar usando el identificador del hogar/vivienda.
-4. Tratamiento de faltantes (según el criterio definido en el documento titulado Steps to constructing the new DHS Wealth Index).
-5. Análisis de Componentes Principales.
-6. Uso del **primer componente** como puntaje de riqueza.
-7. Estandarización del puntaje (z-score).
-8. Clasificación en **quintiles** (o deciles).
-9. Agregación a nivel municipal.
+La secuencia metodológica es la siguiente:
+
+1. Selección de activos y características de la vivienda.
+2. Transformación de variables categóricas en dummies binarias o continuas.
+3. Agregación de información individual a nivel hogar.
+4. Imputación de valores perdidos .
+5. Aplicación de Análisis de Componentes Principales (PCA).
+6. Extracción del primer componente principal.
+7. Estandarización del puntaje de riqueza (z-score).
+8. Clasificación de hogares en quintiles de riqueza.
+9. Agregación del índice a nivel municipal.
 
 ---
 
 ## Datos fuente
 
-Los insumos utilizados en este análisis provienen exclusivamente del **Censo de Población y Vivienda 2012 y 2024** de Bolivia.
+Los insumos provienen únicamente de los operativos oficiales publicados por el INE
 
-Para acceder a los enlaces de descarga y documentación oficial, diríjase a la carpeta denominada `source-data` dentro de este repositorio, donde encontrará la información al respecto.
+* **[Censo de Población y Vivienda 2012](https://anda.ine.gob.bo/index.php/catalog/8)**
+* **[Censo de Población y Vivienda 2024](https://anda.ine.gob.bo/index.php/catalog/132)**
+
+> **Nota de filtro:** Para garantizar la comparabilidad, la base de datos se filtró únicamente para **viviendas particulares** en ambos periodos.
 
 ---
 
-## Variables utilizadas 
+## Variables utilizadas en el Índice de Riqueza
 
-Las variables finales (ya construidas como dummies/indicadores a nivel hogar) se agrupan en:
+> **AVISO IMPORTANTE:** Las variables enumeradas a continuación son las seleccionadas preliminarmente para el modelo. **No representan la lista final**, ya que están sujetas a pruebas de varianza y consistencia estadística durante la fase de validación del PCA.
 
-### Calidad de vivienda
-- Material de piso
-- Material de pared
-- Material de techo
-- Personas por dormitorio
+### Calidad de la vivienda
+- Material del piso
+- Material del techo
+- Material de las paredes
+- Hacinamiento (variable continua: personas por dormitorio)
 
 ### Servicios básicos
-- Fuente de agua
-- Tipo de sanitario
-- Tipo de desagüe
-- Energía eléctrica
+- Fuente de agua.
+- Tipo de servicio sanitario y sistema de desagüe
+- Fuente de electricidad
 - Combustible para cocinar
 
-### Bienes durables
-- Radio, TV, teléfono, computadora
-- Bicicleta, motocicleta, vehículo
-- Cuarto exclusivo para cocinar
-- Carreta/carretón
-- Bote/canoa/balsa
+### Bienes 
+- Radio, Televisor, Teléfono, Computadora.
+- Medios de transporte: Bicicleta, Motocicleta, Vehículo automotor, Carreta, Bote/Canoa.
+- Equipamiento: Cocina exclusiva.
 
-### Tenencia y trabajo del hogar
-- Tenencia/propiedad de la vivienda
-- Presencia de ayuda doméstica
+### Tenencia y condiciones del hogar
+- Vivienda propia.
+- Presencia de ayuda doméstica.
 
-## Codebook 
+---
+
+## Codebook (resumen)
+
+### Variables de entrada (hogar)
+*Nota: Estas variables se transforman en indicadores binarios (1=Posee, 0=No posee) o continuas antes del análisis.
 
 | Variable | Descripción |
 |--------|------------|
@@ -110,5 +119,15 @@ Las variables finales (ya construidas como dummies/indicadores a nivel hogar) se
 | q5_share | Proporción de hogares en el quintil más rico |
 
 
+## Referencias metodológicas
+
+- **[Rutstein (2008): The DHS Wealth Index](https://dhsprogram.com/publications/publication-cr15-comparative-reports.cfm)**
+- **[Filmer & Pritchett (2001): Estimating Wealth Effects](https://www.jstor.org/stable/3088292)**
+
+---
+
+## Contacto
+
+Este repositorio fue desarrollado con fines de investigación aplicada y comparación territorial. 
 
 
