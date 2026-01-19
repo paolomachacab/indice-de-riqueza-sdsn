@@ -76,11 +76,9 @@ Las variables finales (ya construidas como dummies/indicadores a nivel hogar) se
 
 El script produce (por año):
 
-- `wealth_hogar_YYYY.dta`  
-  Puntaje de riqueza a nivel hogar + clasificación (quintiles u otra)
+- Puntaje de riqueza a nivel hogar + clasificación (quintiles u otra)
 
-- `wealth_municipio_YYYY.dta`  
-  Resumen municipal del índice (promedios y distribución por grupos)
+- Resumen municipal del índice
 
 ---
 
