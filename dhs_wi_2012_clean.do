@@ -205,7 +205,7 @@ label var con_migrante "Hogar con al menos un migrante"
 ********************************************************************************
 
 *========================================================
-* 1) PISO: P06_PISOS 
+* 1) PISO: P06_PISOS (OK)
 *========================================================
 
 * Tierra (1)
@@ -270,7 +270,7 @@ tab piso_ladrillo_hog, m
 
 
 *========================================================
-* 2) TECHO: P05_TECHO 
+* 2) TECHO: P05_TECHO (OK)
 *========================================================
 cap label drop lbl_techo2012
 label define lbl_techo2012 ///
@@ -297,7 +297,7 @@ label var techo4_hog "Techo: Paja/palma/caña/barro (dummy)"
 
 
 *========================================================
-* 3) PARED: P03_PARED 
+* 3) PARED: P03_PARED (OK)
 *========================================================
 cap label drop lbl_pared2012
 label define lbl_pared2012 ///
@@ -328,9 +328,9 @@ label var pared6_hog "Pared: Caña/palma/tronco (dummy)"
 
 
 *========================================================
-* 4) AGUA: P07_AGUAPRO 
+* 4) AGUA: P07_AGUAPRO (OK)
 *========================================================
-foreach s in red pileta aguatero pozobomba pozosin rio lago {
+foreach s in red pileta aguatero pozobomba pozosin rio {
     cap drop agua_`s'_hog
 }
 
@@ -382,8 +382,16 @@ drop agua_rio_ind
 label var agua_rio_hog "Agua: Río/vertiente/acequia (dummy)"
 tab agua_rio_hog, m
 
+gen agua_rio_lago_ind = .
+replace agua_rio_lago_ind = 1 if inlist(P07_AGUAPRO,6,7)
+replace agua_rio_lago_ind = 0 if !missing(P07_AGUAPRO) & !inlist(P07_AGUAPRO,6,7)
+bys I_BC_VIV: egen agua_rio_lago_hog = max(agua_rio_lago_ind)
+drop agua_rio_lago_ind
+label var agua_rio_lago_hog "Agua: Río/vertiente/acequia/lago (dummy)"
+tab agua_rio_lago_hog, m
+
 **************
-* Primera variación: Agua mejorada
+* Primera variación: Agua mejorada 
 **************
 
 * Agua mejorada
@@ -396,7 +404,7 @@ replace agua_mejorada = 1 if inlist(P07,1,2,4) & URBRUR==2
 tab agua_mejorada,m
 
 *========================================================
-* 5) SANEAMIENTO: P09_SERVSANIT
+* 5) SANEAMIENTO: P09_SERVSANIT (OK)
 *========================================================
 foreach c in 1 2 {
     cap drop sanit`c'_hog
@@ -412,7 +420,7 @@ label var sanit2_hog "Sanitario: Sí, compartido (dummy)"
 
 
 *========================================================
-* 6) DESAGÜE: P10_DESAGUE 
+* 6) DESAGÜE: P10_DESAGUE (OK)
 *========================================================
 cap drop desag_alcantarillado_hog desag_septica_hog desag_pozo_ciego_hog desag_superficie_hog
 
@@ -829,6 +837,7 @@ duplicates drop
 save "$out\viviendas_unicas_2012.dta", replace
 
 restore 
+
 
 
 
