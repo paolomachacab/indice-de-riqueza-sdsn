@@ -708,7 +708,7 @@ replace hacin_ind = 1 if pers_dorm_temp > 2 & P15_DORMIT > 0
 bys I_BC_VIV: egen hacin_viv = max(hacin_ind)
 drop hacin_ind pers_dorm_temp
 
-label var hacin_viv "Vivienda con hacinamiento (1=Sí:Medio/Alto, 0=Sin)"
+label var hacin_viv "Vivienda con hacinamiento (1=Sí:Medio/Alto, 0=Bajo)"
 label define binlab 0 "Sin" 1 "Con hacinamiento"
 label values hacin_viv binlab
 tab hacin_viv, m
@@ -837,6 +837,7 @@ duplicates drop
 save "$out\viviendas_unicas_2012.dta", replace
 
 restore 
+
 
 
 
