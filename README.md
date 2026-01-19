@@ -70,30 +70,45 @@ Las variables finales (ya construidas como dummies/indicadores a nivel hogar) se
 - Tenencia/propiedad de la vivienda
 - Presencia de ayuda doméstica
 
----
+## Codebook 
 
-## Salidas (outputs)
+| Variable | Descripción |
+|--------|------------|
+| piso_*_hog | Material del piso |
+| techo*_hog | Material del techo |
+| pared*_hog | Material de las paredes |
+| agua_*_hog | Fuente de agua |
+| sanit*_hog | Tipo de servicio sanitario |
+| desag_*_hog | Tipo de desagüe |
+| elec*_hog | Fuente de electricidad |
+| comb_*_hog | Combustible para cocinar |
+| radio_hog | Tiene radio |
+| tv_hog | Tiene televisor |
+| telef_hog | Tiene teléfono |
+| comput_hog | Tiene computadora |
+| bici_hog | Tiene bicicleta |
+| moto_hog | Tiene motocicleta |
+| vehic_hog | Tiene vehículo |
+| cocina_hog | Cocina exclusiva |
+| carreta_hog | Tiene carreta |
+| bote_hog | Tiene bote |
+| vivprop_hog | Vivienda propia |
+| hacin_viv | Hacinamiento |
+| ayuda_dom_viv | Ayuda doméstica |
 
-El script produce (por año):
+### Variables de salida
 
-- Puntaje de riqueza a nivel hogar + clasificación (quintiles u otra)
+| Variable | Descripción |
+|--------|------------|
+| wealth_score | Puntaje bruto del PCA (primer componente) |
+| wealth_z | Puntaje estandarizado del índice de riqueza |
+| q_wealth | Quintil de riqueza (1 = más pobre, 5 = más rico) |
+| mun | Código de municipio |
+| hogares | Número de hogares |
+| mean_wealth | Promedio del índice de riqueza (municipal) |
+| q1_share | Proporción de hogares en el quintil más pobre |
+| q5_share | Proporción de hogares en el quintil más rico |
 
-- Resumen municipal del índice
 
----
 
-## Codebook (variables principales)
-
-| Variable | Definición |
-|---|---|
-| `wealth_score` | Puntaje crudo del primer componente del PCA |
-| `wealth_z` | Puntaje estandarizado (z-score) |
-| `wealth_quintile` | Quintil (1=Más pobre, 5=Más rico) |
-| `MUN` / `IMUN` | Código de municipio (según el año/base) |
-| `hogares` | Número de hogares considerados |
-| `mean_wealth` | Promedio municipal del puntaje de riqueza |
-| `q1_share` | % de hogares del municipio en Q1 |
-| `q5_share` | % de hogares del municipio en Q5 |
-
----
 
