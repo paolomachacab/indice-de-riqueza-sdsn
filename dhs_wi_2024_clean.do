@@ -388,6 +388,17 @@ label var comb_guano_hog "Combustible: guano/estiercol"
 tab comb_guano_hog, m
 
 
+*Combustible limpio para cocinar:
+
+gen comb_limpio_ind = .
+replace comb_limpio_ind = 1 if inlist(v10_combus,1,2,5,6)
+replace comb_limpio_ind = 0 if !missing(v10_combus) & !inlist(v10_combus,1,2,5,6)
+bys i00: egen comb_limpio_hog = max(comb_gas_ind)
+drop comb_limpio_ind
+label var comb_limpio_hog "Combustible limpio para cocinar"
+tab comb_limpio_hog, m
+
+
 * --- 9) BIENES ---
 gen radio_ind = .
 replace radio_ind = 1 if v19a_radio==1
@@ -604,6 +615,7 @@ keep i00 w_quintil
 duplicates drop  
 save "$out\viviendas_unicas_2024.dta", replace
 restore 
+
 
 
 
