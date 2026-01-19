@@ -4,16 +4,17 @@ Este repositorio contiene los **datos de salida** y el **código reproducible (S
 
 La construcción sigue la lógica del **DHS Wealth Index**, que utiliza **Análisis de Componentes Principales (PCA)** sobre un conjunto de variables de activos y condiciones de vivienda para aproximar el **estatus económico** del hogar (no ingreso ni consumo). :contentReference[oaicite:0]{index=0}
 
-El repositorio provee:
-- Código reproducible (Stata)
-- Quintiles (o deciles/cuartiles, si se desea)
-- Agregación a nivel municipal
+### Contenido del Repositorio
+
+* **Código reproducible:** Archivos .do de Stata para el procesamiento y cálculo del índice de riqueza.
+* **Quintiles de riqueza:** Bases de datos con la estratificación socioeconómica resultante.
+* **Datos municipales:** Resultados del índice agregados a nivel geográfico municipal.
 
 ---
 
 ## Requisitos de software
 
-Este proyecto fue escrito y probado en **Stata 17**. Se recomienda instalar Stata 17 (o una versión posterior compatible) antes de ejecutar los scripts. :contentReference[oaicite:1]{index=1}
+Este proyecto fue desarrollado y probado en **[Stata 17](https://www.stata.com/stata17/)**. Se recomienda utilizar esta versión o una superior para asegurar la compatibilidad de los scripts.
 
 ---
 
@@ -29,7 +30,7 @@ El índice se construye con PCA aplicado a variables de activos y característic
 6. Uso del **primer componente** como puntaje de riqueza.
 7. Estandarización del puntaje (z-score).
 8. Clasificación en **quintiles** (o deciles/cuartiles).
-9. Agregación a nivel municipal (promedios, proporciones por quintil, etc.). :contentReference[oaicite:2]{index=2}
+9. Agregación a nivel municipal (promedios, proporciones por quintil, etc.). 
 
 ---
 
