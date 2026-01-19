@@ -866,6 +866,108 @@ restore
 
 
 
+********************************************************************************
+* COLAPSO A NIVEL HOGAR
+********************************************************************************
+preserve
+
+collapse (max) ///
+    jefe_hogar discapacitado_v ///
+    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_cemento_hog piso_mos_cer_hog piso_ladrillo_hog ///
+    techo1_hog techo2_hog techo3_hog techo4_hog ///
+    pared1_hog pared2_hog pared3_hog pared4_hog pared5_hog pared6_hog ///
+    agua_red_hog agua_pileta_hog agua_aguatero_hog agua_pozobomba_hog agua_pozosin_hog agua_rio_hog ///
+    sanit1_hog sanit2_hog ///
+    desag_alcantarillado_hog desag_septica_hog desag_pozo_ciego_hog desag_superficie_hog ///
+    elec1_hog elec2_hog elec3_hog ///
+    comb_gas_hog comb_elec_hog comb_solar_hog comb_lena_hog comb_guano_hog ///
+    radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog cocina_hog carreta_hog bote_hog ///
+    vivprop_hog ///
+    hacin_viv ///
+    ayuda_dom_viv ///
+    (first) I02_DEPTO I03_PROV MUN TOTPERS_VIV /// 
+    , by(I_BC_VIV)
+
+compress
+save "$out\base_hogar_censo_preparada.dta", replace
+
+********************************************************************************
+* CÁLCULO DEL PCA (ÍNDICE DE RIQUEZA)
+********************************************************************************
+* Definimos los activos
+global X_wealth ///
+    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_cemento_hog piso_mos_cer_hog piso_ladrillo_hog ///
+    techo1_hog techo2_hog techo3_hog techo4_hog ///
+    pared1_hog pared2_hog pared3_hog pared4_hog pared5_hog pared6_hog ///
+    agua_red_hog agua_pileta_hog agua_aguatero_hog agua_pozobomba_hog agua_pozosin_hog agua_rio_hog ///
+    sanit1_hog sanit2_hog ///
+    desag_alcantarillado_hog desag_septica_hog desag_pozo_ciego_hog desag_superficie_hog ///
+    elec1_hog elec2_hog elec3_hog ///
+    comb_gas_hog comb_elec_hog comb_solar_hog comb_lena_hog comb_guano_hog ///
+    radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog cocina_hog carreta_hog bote_hog ///
+    vivprop_hog ///
+    hacin_viv ///
+    ayuda_dom_viv
+
+* PCA (Matriz de correlación)
+pca $X_wealth, corr
+
+* Predecimos el puntaje (Score) para cada hogar
+cap drop wealth_score wealth_z
+predict wealth_score if e(sample), score
+
+* Estandarizamos (Media 0, Desviación 1)
+egen wealth_z = std(wealth_score)
+label var wealth_z "Índice de Riqueza Continuo (PCA Z-score)"
+
+********************************************************************************
+* 3. GENERACIÓN DE QUINTILES (AQUÍ ESTÁ LA DIFERENCIA)
+********************************************************************************
+label define q_lab 1 "Q1 (Pobre)" 2 "Q2" 3 "Q3" 4 "Q4" 5 "Q5 (Rico)", replace
+
+* --- OPCIÓN A: A NIVEL DE PERSONAS (DHS/BM) ---
+* Se usa [fw=TOTPERS_VIV].
+* Interpretación: El Q1 contiene al 20% de la GENTE más pobre.
+cap drop quintil_personas
+xtile quintil_personas = wealth_z [fw=TOTPERS_VIV], nq(5)
+label values quintil_personas q_lab
+label var quintil_personas "Quintil de Riqueza (Ponderado por Población)"
+
+* --- OPCIÓN B: A NIVEL DE HOGARES (Estructural) ---
+* NO se usan pesos.
+* Interpretación: El Q1 contiene al 20% de las CASAS más pobres.
+cap drop quintil_hogares
+xtile quintil_hogares = wealth_z, nq(5)
+label values quintil_hogares q_lab
+label var quintil_hogares "Quintil de Riqueza (Nivel Hogar)"
+
+save "$out\base_hogar_wealth_censo_final.dta", replace
+
+********************************************************************************
+* 4. EXPORTAR RESULTADOS AGREGADOS (MUNICIPIOS)
+********************************************************************************
+
+* --- Exportar datos municipales basados en PERSONAS ---
+preserve
+* Promedio ponderado por población
+collapse (mean) riqueza_promedio=wealth_z (count) poblacion=wealth_z [iw=tot_miembros], by(MUN)
+xtile quintil_mun_personas = riqueza_promedio, nq(5)
+label var quintil_mun_personas "Ranking Municipal (Basado en Personas)"
+save "$out\resumen_municipal_personas.dta", replace
+restore
+
+* --- Exportar datos municipales basados en HOGARES ---
+preserve
+* Promedio simple de hogares
+collapse (mean) riqueza_promedio=wealth_z (count) num_hogares=wealth_z, by(MUN)
+xtile quintil_mun_hogares = riqueza_promedio, nq(5)
+label var quintil_mun_hogares "Ranking Municipal (Basado en Hogares)"
+save "$out\resumen_municipal_hogares.dta", replace
+restore
+
+restore
+
+
 
 
 
