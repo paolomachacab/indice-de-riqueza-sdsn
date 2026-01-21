@@ -315,6 +315,20 @@ label var techo2_hog "Techo: Teja (dummy)"
 label var techo3_hog "Techo: Losa de hormigón armado (dummy)"
 label var techo4_hog "Techo: Paja/palma/caña/barro (dummy)"
 
+*sum
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+  techo1_ind |  9,827,089    .5142804    .4997961          0          1
+  techo1_hog |  9,827,089    .5142804    .4997961          0          1
+  techo2_ind |  9,827,089    .3019295    .4590949          0          1
+  techo2_hog |  9,827,089    .3019295    .4590949          0          1
+  techo3_ind |  9,827,089    .0612553     .239798          0          1
+-------------+---------------------------------------------------------
+  techo3_hog |  9,827,089    .0612553     .239798          0          1
+  techo4_ind |  9,827,089    .1020892    .3027656          0          1
+  techo4_hog |  9,827,089    .1020892    .3027656          0          1
+
 
 *========================================================
 * 3) PARED: P03_PARED (OK)
@@ -345,6 +359,27 @@ label var pared3_hog "Pared: Tabique/quinche (dummy)"
 label var pared4_hog "Pared: Piedra (dummy)"
 label var pared5_hog "Pared: Madera (dummy)"
 label var pared6_hog "Pared: Caña/palma/tronco (dummy)"
+
+
+*sum
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+  pared1_ind |  9,827,089    .5417554    .4982535          0          1
+  pared1_hog |  9,827,089    .5417554    .4982535          0          1
+  pared2_ind |  9,827,089    .3527636    .4778299          0          1
+  pared2_hog |  9,827,089    .3527636    .4778299          0          1
+  pared3_ind |  9,827,089    .0175801    .1314193          0          1
+-------------+---------------------------------------------------------
+  pared3_hog |  9,827,089    .0175801    .1314193          0          1
+  pared4_ind |  9,827,089    .0102422    .1006841          0          1
+  pared4_hog |  9,827,089    .0102422    .1006841          0          1
+  pared5_ind |  9,827,089    .0599325    .2373617          0          1
+  pared5_hog |  9,827,089    .0599325    .2373617          0          1
+-------------+---------------------------------------------------------
+  pared6_ind |  9,827,089    .0088837    .0938338          0          1
+  pared6_hog |  9,827,089    .0088837    .0938338          0          1
+
 
 
 *========================================================
@@ -423,6 +458,24 @@ replace agua_mejorada = 1 if inlist(P07,1,2) & URBRUR==1
 replace agua_mejorada = 1 if inlist(P07,1,2,4) & URBRUR==2
 tab agua_mejorada,m
 
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+agua_mejor~a |  9,827,089    .8075384    .3942336          0          1
+agua_red_ind |  9,827,089    .7000999     .458214          0          1
+agua_red_hog |  9,827,089    .7000999     .458214          0          1
+agua_pilet~d |  9,827,089    .0840167    .2774129          0          1
+agua_pilet~g |  9,827,089    .0840167    .2774129          0          1
+-------------+---------------------------------------------------------
+agua_aguat~d |  9,827,089    .0292641    .1685459          0          1
+agua_aguat~g |  9,827,089    .0292641    .1685459          0          1
+agua_pozob~d |  9,827,089    .0394913    .1947608          0          1
+agua_pozob~g |  9,827,089    .0394913    .1947608          0          1
+agua_pozos~d |  9,827,089    .0639061    .2445856          0          1
+-------------+---------------------------------------------------------
+agua_pozos~g |  9,827,089    .0639061    .2445856          0          1
+
+
 *========================================================
 * 5) SANEAMIENTO: P09_SERVSANIT (OK)
 *========================================================
@@ -437,6 +490,13 @@ foreach c in 1 2 {
 }
 label var sanit1_hog "Sanitario: Sí, privado (dummy)"
 label var sanit2_hog "Sanitario: Sí, compartido (dummy)"
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+  sanit1_ind |  9,827,089    .3975762     .489397          0          1
+  sanit1_hog |  9,827,089    .3975762     .489397          0          1
+  sanit2_ind |  9,827,089     .335279    .4720879          0          1
+  sanit2_hog |  9,827,089     .335279    .4720879          0          1
 
 
 *========================================================
@@ -476,10 +536,11 @@ drop desag_superficie_ind
 label var desag_superficie_hog "Desagüe: a la superficie (4-6) (dummy)"
 tab desag_superficie_hog, m
 
+
 *******************
 * Primera variación: desague desagregado en copartido o no compartido
 *******************
-tab P10_DESAGUE,m	// con missings, ya que los individuos no cuentan con servicio sanitario, baño o letrina 
+tab P10_DESAGUE,m	// con missings (26,71 %) ya que los individuos no cuentan con servicio sanitario, baño o letrina 
 tab P09_SERVSANIT,m
 
 gen baño_exclusivo = P09_SERVSANIT == 1 if !missing(P09_SERVSANIT)
@@ -986,6 +1047,7 @@ save "$out\resumen_municipal_hogares.dta", replace
 restore
 
 restore
+
 
 
 
