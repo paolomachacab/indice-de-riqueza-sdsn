@@ -598,6 +598,32 @@ replace saneamiento_mejorado = 0 if inlist(P10_DESAGUE,1) & URBRUR==1
 replace saneamiento_mejorado = 0 if inlist(P10_DESAGUE,1,2,3) & URBRUR==2
 tab saneamiento_mejorado,m
 
+*sum
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+desag_alca~d |  7,201,834    .5558529    .4968707          0          1
+desag_alca~g |  7,201,834    .5558529    .4968707          0          1
+desag_sept~d |  7,201,834    .1235657    .3290855          0          1
+desag_sept~g |  7,201,834    .1235657    .3290855          0          1
+desag_pozo~d |  7,201,834    .3143592    .4642602          0          1
+-------------+---------------------------------------------------------
+desag_pozo~g |  7,201,834    .3143592    .4642602          0          1
+desag_supe~d |  7,201,834    .0062222    .0786349          0          1
+desag_supe~g |  7,201,834    .0062222    .0786349          0          1
+red_exclus~o |  9,827,089    .2272892    .4190809          0          1
+red_compar~o |  9,827,089    .1800705    .3842462          0          1
+-------------+---------------------------------------------------------
+septica_ex~o |  9,827,089    .0479961     .213758          0          1
+septica_co~o |  9,827,089    .0425597    .2018623          0          1
+pozo_cieg~vo |  9,827,089    .1201673    .3251571          0          1
+pozo_cieg~do |  9,827,089    .1102125    .3131545          0          1
+superfici~vo |  9,827,089    .0021236    .0460338          0          1
+-------------+---------------------------------------------------------
+superfici~do |  9,827,089    .0024363     .049299          0          1
+saneamient~o |  9,827,089    .4729578    .4992682          0          1
+
+
 
 *========================================================
 * 7) ELECTRICIDAD: P11_ENERGIA 
@@ -614,6 +640,18 @@ foreach c in 1 2 3 {
 label var elec1_hog "Electricidad: servicio público (dummy)"
 label var elec2_hog "Electricidad: generador/motor (dummy)"
 label var elec3_hog "Electricidad: panel solar (dummy)"
+
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+   elec1_ind |  9,827,089     .821244    .3831479          0          1
+   elec1_hog |  9,827,089     .821244    .3831479          0          1
+   elec2_ind |  9,827,089    .0119209    .1085303          0          1
+   elec2_hog |  9,827,089    .0119209    .1085303          0          1
+   elec3_ind |  9,827,089    .0121863     .109717          0          1
+-------------+---------------------------------------------------------
+   elec3_hog |  9,827,089    .0121863     .109717          0          1
+
 
 
 *========================================================
@@ -671,6 +709,27 @@ bys I_BC_VIV: egen comb_limpio_hog = max(comb_limpio_ind)
 drop comb_limpio_ind
 label var comb_limpio_hog "Combustible limpio para cocinar (dummy)"
 tab comb_limpio_hog, m
+
+
+*sum
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+comb_limpi~g |  9,827,089    .7488333    .4336843          0          1
+comb_gas_ind |  9,827,089    .7428504    .4370626          0          1
+comb_gas_hog |  9,827,089    .7428504    .4370626          0          1
+comb_elec_~d |  9,827,089    .2247293     .417404          0          1
+comb_elec_~g |  9,827,089    .2247293     .417404          0          1
+-------------+---------------------------------------------------------
+comb_solar~d |  9,827,089    .0178722     .132487          0          1
+comb_solar~g |  9,827,089    .0178722     .132487          0          1
+comb_lena_~d |  9,827,089    .0056191    .0747495          0          1
+comb_lena_~g |  9,827,089    .0056191    .0747495          0          1
+comb_guano~d |  9,827,089    .0003638    .0190698          0          1
+-------------+---------------------------------------------------------
+comb_guano~g |  9,827,089    .0003638    .0190698          0          1
+
+
 
 
 
@@ -759,6 +818,21 @@ drop bote_ind
 label var bote_hog "Tiene bote/balsa/canoa (dummy)"
 tab bote_hog, m
 
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+   radio_hog |  9,827,089    .7724066    .4192788          0          1
+      tv_hog |  9,827,089    .7186764     .449645          0          1
+   telef_hog |  9,827,089    .6937698    .4609265          0          1
+  comput_hog |  9,827,089    .2606557    .4389924          0          1
+    bici_hog |  9,827,089    .3463406    .4758033          0          1
+-------------+---------------------------------------------------------
+    moto_hog |  9,827,089    .1355094    .3422669          0          1
+   vehic_hog |  9,827,089    .2503894    .4332373          0          1
+  cocina_hog |  9,827,089    .7836865    .4117305          0          1
+ carreta_hog |  9,827,089    .0427604    .2023164          0          1
+    bote_hog |  9,827,089    .0099148    .0990784          0          1
+
+
 
 *========================================================
 * 10) TENENCIA VIVIENDA: P19_TENENCIA (binaria "propia")
@@ -772,19 +846,83 @@ drop vivprop_ind
 label var vivprop_hog "Vivienda propia (dummy: código 1)"
 tab vivprop_hog, m
 
+*tenencia ampliada
+
+cap drop vivalq_hog
+gen vivalq_ind = .
+replace vivalq_ind = 1 if P19_TENENCIA==2
+replace vivalq_ind = 0 if !missing(P19_TENENCIA) & P19_TENENCIA!=2
+bys I_BC_VIV: egen vivalq_hog = max(vivalq_ind)
+drop vivalq_ind
+label var vivalq_hog "Vivienda alquilada (dummy)"
+tab vivalq_hog, m
+
+cap drop vivant_hog
+gen vivant_ind = .
+replace vivant_ind = 1 if inlist(P19_TENENCIA,3,4)
+replace vivant_ind = 0 if !missing(P19_TENENCIA) & !inlist(P19_TENENCIA,3,4)
+bys I_BC_VIV: egen vivant_hog = max(vivant_ind)
+drop vivant_ind
+label var vivant_hog "Vivienda en anticretico (dummy)"
+tab vivant_hog, m
+
+cap drop vivced_hog
+gen vivced_ind = .
+replace vivced_ind = 1 if P19_TENENCIA==5
+replace vivced_ind = 0 if !missing(P19_TENENCIA) & P19_TENENCIA!=5
+bys I_BC_VIV: egen vivced_hog = max(vivced_ind)
+drop vivced_ind
+label var vivced_hog "Vivienda cedida (dummy)"
+tab vivced_hog, m
+
+cap drop vivpres_hog
+gen vivpres_ind = .
+replace vivpres_ind = 1 if P19_TENENCIA==6
+replace vivpres_ind = 0 if !missing(P19_TENENCIA) & P19_TENENCIA!=6
+bys I_BC_VIV: egen vivpres_hog = max(vivpres_ind)
+drop vivpres_ind
+label var vivpres_hog "Vivienda prestada (dummy)"
+tab vivpres_hog, m
+
+cap drop vivced_pres_hog
+gen vivced_pres_ind = .
+replace vivced_pres_ind = 1 if inlist(P19_TENENCIA,5,6)
+replace vivced_pres_ind = 0 if !missing(P19_TENENCIA) & !inlist(P19_TENENCIA,5,6)
+bys I_BC_VIV: egen vivced_pres_hog = max(vivced_pres_ind)
+drop vivced_pres_ind
+label var vivced_pres_hog "Vivienda cedida + prestada (dummy)"
+tab vivced_pres_hog, m
+
+*sum
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+ vivprop_hog |  9,827,089    .7091651    .4541475          0          1
+  vivant_hog |  9,827,089    .0342184    .1817897          0          1
+  vivced_hog |  9,827,089     .022802    .1492717          0          1
+ vivpres_hog |  9,827,089    .0678671    .2515177          0          1
+  vivalq_hog |  9,827,089    .1504434    .3575056          0          1
+-------------+---------------------------------------------------------
+vivced_pre~g |  9,827,089    .0906691    .2871379          0          1
+
+
 
 *==================================================================
 * 11) HACINAMIENTO BINARIO: Dummy (1=Con hacinamiento, 0=Sin)
 *==================================================================
 cap drop pers_dorm_temp hacin_viv
 
+* 1. Ajuste de dormitorios (Paso 4: si es 0, se pone 1 porque deben dormir en algún lado)
+gen p15_adj = P15_DORMIT
+replace p15_adj = 1 if P15_DORMIT == 0
+
 * Calculo temporal
-gen pers_dorm_temp = TOTPERS_VIV / P15_DORMIT if P15_DORMIT > 0
+gen pers_dorm_temp = TOTPERS_VIV / p15_adj 
 
 * Dummy: 1=Medio/Alto (hacinamiento), 0=Sin
 gen hacin_ind = .
-replace hacin_ind = 0 if pers_dorm_temp <= 2 & P15_DORMIT > 0
-replace hacin_ind = 1 if pers_dorm_temp > 2 & P15_DORMIT > 0
+replace hacin_ind = 0 if pers_dorm_temp <= 2 & p15_adj > 0
+replace hacin_ind = 1 if pers_dorm_temp > 2 & p15_adj > 0
 
 bys I_BC_VIV: egen hacin_viv = max(hacin_ind)
 drop hacin_ind pers_dorm_temp
@@ -794,12 +932,10 @@ label define binlab 0 "Sin" 1 "Con hacinamiento"
 label values hacin_viv binlab
 tab hacin_viv, m
 
-* 1. Ajuste de dormitorios (Paso 4: si es 0, se pone 1 porque deben dormir en algún lado)
-gen p15_adj = P15_DORMIT
-replace p15_adj = 1 if P15_DORMIT == 0
-
 * 2. Creación de la variable CONTINUA (Ratio real sin cortes)
 gen pers_dorm = TOTPERS_VIV / p15_adj
+
+replace pers_dorm = 10 if pers_dorm > 10
 
 * 3. Tratamiento de Missings: Identificar casos donde falta tot_pers o v14_dormit
 * (Se dejan como . para el siguiente paso)
@@ -832,6 +968,14 @@ label define binlab 0 "No" 1 "Sí"
 label values ayuda_dom_viv binlab
 label var ayuda_dom_viv "Vivienda con ayuda doméstica (dummy)"
 tab ayuda_dom_viv, m
+
+*sum
+
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+ayuda_dom_~v |  9,827,089    .0157779    .1246153          0          1
+
 
 
 *******************************************************************************
@@ -1047,6 +1191,7 @@ save "$out\resumen_municipal_hogares.dta", replace
 restore
 
 restore
+
 
 
 
