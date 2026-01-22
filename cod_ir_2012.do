@@ -921,8 +921,8 @@ gen pers_dorm_temp = TOTPERS_VIV / p15_adj
 
 * Dummy: 1=Medio/Alto (hacinamiento), 0=Sin
 gen hacin_ind = .
-replace hacin_ind = 0 if pers_dorm_temp <= 2 & p15_adj > 0
-replace hacin_ind = 1 if pers_dorm_temp > 2 & p15_adj > 0
+replace hacin_ind = 1 if pers_dorm_temp <= 2 & p15_adj > 0
+replace hacin_ind = 0 if pers_dorm_temp > 2 & p15_adj > 0
 
 bys I_BC_VIV: egen hacin_viv = max(hacin_ind)
 drop hacin_ind pers_dorm_temp
@@ -1191,6 +1191,7 @@ save "$out\resumen_municipal_hogares.dta", replace
 restore
 
 restore
+
 
 
 
