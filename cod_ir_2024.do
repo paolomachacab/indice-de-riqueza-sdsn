@@ -675,76 +675,185 @@ save "$out\hogar_2024_wealth_base.dta", replace
 * 2. PCA (ÍNDICE DE RIQUEZA)
 ********************************************************************************
 
-global wealth_vars ///
-    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_cemento_hog piso_mos_cer_hog piso_ladrillo_hog ///
+********************************************************************************
+* VERSION A — PCA con DESAGÜE DESAGREGADO
+********************************************************************************
+global X_A_2024 ///
+    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_mos_cer_hog piso_cemento_hog piso_ladrillo_hog ///
     techo1_hog techo2_hog techo3_hog techo4_hog ///
     pared1_hog pared2_hog pared3_hog pared4_hog pared5_hog pared6_hog ///
-    agua_red_hog agua_pileta_hog agua_aguatero_hog agua_pozobomba_hog agua_pozosin_hog agua_rio_hog ///
+    agua_mejorada ///
     sanit1_hog sanit2_hog ///
     desag_alcantarillado_hog desag_septica_hog desag_pozo_ciego_hog desag_superficie_hog ///
     elec1_hog elec2_hog elec3_hog ///
-    comb_gas_hog comb_elec_hog comb_solar_hog comb_lena_hog comb_guano_hog ///
-    radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog carreta_hog bote_hog cocina_hog ///
-    vivprop_hog ayuda_dom_viv hacin_viv
+    comb_limpio_hog ///
+    radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog cocina_hog carreta_hog bote_hog ///
+    vivprop_hog ///
+    hacin_viv ///
+    ayuda_dom_viv
 
-* PCA (Agregado 'corr' por seguridad estándar)
-pca $wealth_vars, corr
+pca $X_A_2024, corr
+cap drop wiA24_score wiA24_z qA24_hog qA24_per
+predict wiA24_score if e(sample), score
+egen wiA24_z = std(wiA24_score)
+label var wiA24_z "WI 2024 A (PCA corr, desagüe desagregado, z)"
 
-* Score y Estandarización
-cap drop wealth_score wealth_z
-predict wealth_score if e(sample), score
-egen wealth_z = std(wealth_score)
+label define qwl 1 "Q1 (más pobre)" 2 "Q2" 3 "Q3" 4 "Q4" 5 "Q5 (más rico)", replace
 
-********************************************************************************
-* 3. CÁLCULO DE LOS DOS TIPOS DE QUINTILES
-********************************************************************************
-label define q5 1 "Q1 (Más pobre)" 2 "Q2" 3 "Q3" 4 "Q4" 5 "Q5 (Más rico)", replace
+xtile qA24_hog = wiA24_z if wiA24_z < ., nq(5)
+label values qA24_hog qwl
+label var qA24_hog "Quintil 2024 A (hogares)"
 
-* --- A. Quintil Poblacional (El estándar DHS/BM/Censo) ---
-* Ponderado por [fw=tot_pers]. El 20% de la GENTE está en cada grupo.
-cap drop w_quintil_pers
-xtile w_quintil_pers = wealth_z [fw=tot_pers], nq(5)
-label values w_quintil_pers q5
-label var w_quintil_pers "Quintil de Riqueza 2024 (Poblacional)"
+xtile qA24_per = wiA24_z [fw=tot_pers] if wiA24_z < ., nq(5)
+label values qA24_per qwl
+label var qA24_per "Quintil 2024 A (personas)"
 
-* --- B. Quintil Hogares ---
-cap drop w_quintil_hog
-xtile w_quintil_hog = wealth_z, nq(5)
-label values w_quintil_hog q5
-label var w_quintil_hog "Quintil de Riqueza 2024 (Hogares)"
+save "$out\wealth_2024_A_desague.dta", replace
 
-save "$out\hogar_2024_wealth_con_pca.dta", replace
 
 ********************************************************************************
-* 4. EXPORTAR RESULTADOS MUNICIPALES
+*  VERSION B — PCA con SANEAMIENTO MEJORADO
 ********************************************************************************
+use "$out\base_hogar_2024_para_pca.dta", clear
 
-* --- Opción 1: Ranking Municipal basado en la Población ---
+global X_B_2024 ///
+    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_mos_cer_hog piso_cemento_hog piso_ladrillo_hog ///
+    techo1_hog techo2_hog techo3_hog techo4_hog ///
+    pared1_hog pared2_hog pared3_hog pared4_hog pared5_hog pared6_hog ///
+    agua_mejorada ///
+    sanit1_hog sanit2_hog ///
+    saneamiento_mejorado ///
+    elec1_hog elec2_hog elec3_hog ///
+    comb_limpio_hog ///
+    radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog cocina_hog carreta_hog bote_hog ///
+    vivprop_hog ///
+    hacin_viv ///
+    ayuda_dom_viv
+
+pca $X_B_2024, corr
+cap drop wiB24_score wiB24_z qB24_hog qB24_per
+predict wiB24_score if e(sample), score
+egen wiB24_z = std(wiB24_score)
+label var wiB24_z "WI 2024 B (PCA corr, saneamiento mejorado, z)"
+
+xtile qB24_hog = wiB24_z if wiB24_z < ., nq(5)
+label values qB24_hog qwl
+label var qB24_hog "Quintil 2024 B (hogares)"
+
+xtile qB24_per = wiB24_z [fw=tot_pers] if wiB24_z < ., nq(5)
+label values qB24_per qwl
+label var qB24_per "Quintil 2024 B (personas)"
+
+save "$out\wealth_2024_B_desague.dta", replace
+
+********************************************************************************
+* BASE FINAL 2024 (A y B en un solo archivo)
+********************************************************************************
+save "$out\wealth_2024_AB_en_un_archivo.dta", replace
+
+
+********************************************************************************
+* 6) RANKING MUNICIPAL (valor + quintil) — A y B, hogares y personas
+********************************************************************************
+tempfile munA24_hog munA24_per munB24_hog munB24_per
+
+* --- A: hogares ---
 preserve
-* Usamos [iw=tot_pers] para que el promedio refleje la riqueza de la gente del municipio
-collapse (mean) mean_wealth=wealth_z (count) poblacion=wealth_z [iw=tot_pers], by(mun_res_cod)
-
-xtile quintil_mun_pob = mean_wealth, nq(5)
-label values quintil_mun_pob q5
-label var quintil_mun_pob "Quintil Municipal (Basado en Población)"
-
-save "$out\wealth_municipal_poblacion_2024.dta", replace
+collapse (mean) wiA24_mun_hog=wiA24_z (count) n_hogares=wiA24_z, by(mun_res_cod)
+xtile q_munA24_hog = wiA24_mun_hog, nq(5)
+label values q_munA24_hog qwl
+save `munA24_hog', replace
+save "$out\mun_2024_A_hogares.dta", replace
 restore
 
-* --- Opción 2: Ranking Municipal basado en Hogares ---
+* --- A: personas (promedio ponderado correcto) ---
 preserve
-collapse (mean) mean_wealth=wealth_z (count) hogares=wealth_z, by(mun_res_cod)
-
-xtile quintil_mun_hog = mean_wealth, nq(5)
-label values quintil_mun_hog q5
-label var quintil_mun_hog "Quintil Municipal (Basado en Hogares)"
-
-save "$out\wealth_municipal_hogares_2024.dta", replace
+gen double w_wiA24 = wiA24_z * tot_pers
+collapse (sum) sum_w_wiA24=w_wiA24 ///
+         (sum) poblacion=tot_pers ///
+         (count) n_hogares=wiA24_z, by(mun_res_cod)
+gen double wiA24_mun_per = sum_w_wiA24 / poblacion
+drop sum_w_wiA24
+xtile q_munA24_per = wiA24_mun_per, nq(5)
+label values q_munA24_per qwl
+save `munA24_per', replace
+save "$out\mun_2024_A_personas.dta", replace
 restore
 
-* --- 3. Base nivel vivienda ---
+* --- B: hogares ---
 preserve
-keep i00 w_quintil_pers w_quintil_hog
-duplicates drop  
-save "$out\viviendas_unicas_2024.dta", replace
+collapse (mean) wiB24_mun_hog=wiB24_z (count) n_hogares=wiB24_z, by(mun_res_cod)
+xtile q_munB24_hog = wiB24_mun_hog, nq(5)
+label values q_munB24_hog qwl
+save `munB24_hog', replace
+save "$out\mun_2024_B_hogares.dta", replace
 restore
+
+* --- B: personas (promedio ponderado correcto) ---
+preserve
+gen double w_wiB24 = wiB24_z * tot_pers
+collapse (sum) sum_w_wiB24=w_wiB24 ///
+         (sum) poblacion=tot_pers ///
+         (count) n_hogares=wiB24_z, by(mun_res_cod)
+gen double wiB24_mun_per = sum_w_wiB24 / poblacion
+drop sum_w_wiB24
+xtile q_munB24_per = wiB24_mun_per, nq(5)
+label values q_munB24_per qwl
+save `munB24_per', replace
+save "$out\mun_2024_B_personas.dta", replace
+restore
+
+
+********************************************************************************
+* DISTRIBUCIÓN INTRA-MUNICIPAL (hogares y personas por quintil) — A y B
+********************************************************************************
+tempfile distA24_hog distA24_per distB24_hog distB24_per
+
+* --- A: hogares ---
+preserve
+contract mun_res_cod qA24_hog
+bys mun_res_cod: egen hogares_mun = total(_freq)
+gen share_hog = _freq / hogares_mun
+rename _freq hogares_q
+order mun_res_cod qA24_hog hogares_q share_hog hogares_mun
+save `distA24_hog', replace
+restore
+
+* --- A: personas ---
+preserve
+collapse (sum) personas_q=tot_pers, by(mun_res_cod qA24_per)
+bys mun_res_cod: egen personas_mun = total(personas_q)
+gen share_per = personas_q / personas_mun
+order mun_res_cod qA24_per personas_q share_per personas_mun
+save `distA24_per', replace
+restore
+
+* --- B: hogares ---
+preserve
+contract codm qB24_hog
+bys codm: egen hogares_mun = total(_freq)
+gen share_hog = _freq / hogares_mun
+rename _freq hogares_q
+order codm qB24_hog hogares_q share_hog hogares_mun
+save `distB24_hog', replace
+restore
+
+* --- B: personas ---
+preserve
+collapse (sum) personas_q=tot_pers, by(codm qB24_per)
+bys codm: egen personas_mun = total(personas_q)
+gen share_per = personas_q / personas_mun
+order codm qB24_per personas_q share_per personas_mun
+save `distB24_per', replace
+restore
+
+
+********************************************************************************
+* Comparación A vs B (2024)
+********************************************************************************
+use "$out\wealth_2024_AB_en_un_archivo.dta", clear
+corr wiA24_z wiB24_z
+tab qA24_hog qB24_hog, row col
+tab qA24_per qB24_per [fw=tot_pers], row col
+
+
