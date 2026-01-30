@@ -1119,79 +1119,136 @@ save "$out\base_hogar_censo_preparada.dta", replace
 ********************************************************************************
 * CÁLCULO DEL PCA (ÍNDICE DE RIQUEZA)
 ********************************************************************************
-* Definimos los activos
-global X_wealth ///
-    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_cemento_hog piso_mos_cer_hog piso_ladrillo_hog ///
+********************************************************************************
+* VERSION A — PCA con DESAGÜE DESAGREGADO (DHS-like)
+********************************************************************************
+global X_A ///
+    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_mos_cer_hog piso_cemento_hog piso_ladrillo_hog ///
     techo1_hog techo2_hog techo3_hog techo4_hog ///
     pared1_hog pared2_hog pared3_hog pared4_hog pared5_hog pared6_hog ///
-    agua_red_hog agua_pileta_hog agua_aguatero_hog agua_pozobomba_hog agua_pozosin_hog agua_rio_hog ///
+    agua_mejorada ///
     sanit1_hog sanit2_hog ///
     desag_alcantarillado_hog desag_septica_hog desag_pozo_ciego_hog desag_superficie_hog ///
     elec1_hog elec2_hog elec3_hog ///
-    comb_gas_hog comb_elec_hog comb_solar_hog comb_lena_hog comb_guano_hog ///
+    comb_limpio_hog ///
     radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog cocina_hog carreta_hog bote_hog ///
-    vivprop_hog ///
     hacin_viv ///
     ayuda_dom_viv
 
-* PCA (Matriz de correlación)
-pca $X_wealth, corr
+pca $X_A, corr
+cap drop wi_A_score wi_A_z
+predict wi_A_score if e(sample), score
+egen wi_A_z = std(wi_A_score)
+label var wi_A_z "WI A (PCA corr, desagüe desagregado, z)"
 
-* Predecimos el puntaje (Score) para cada hogar
-cap drop wealth_score wealth_z
-predict wealth_score if e(sample), score
+* Quintiles A (hogares y personas)
+label define qwl 1 "Q1 (más pobre)" 2 "Q2" 3 "Q3" 4 "Q4" 5 "Q5 (más rico)", replace
 
-* Estandarizamos (Media 0, Desviación 1)
-egen wealth_z = std(wealth_score)
-label var wealth_z "Índice de Riqueza Continuo (PCA Z-score)"
+cap drop qA_hog qA_per
+xtile qA_hog = wi_A_z if wi_A_z < ., nq(5)
+label values qA_hog qwl
+label var qA_hog "Quintil A (hogares)"
 
-********************************************************************************
-* 3. GENERACIÓN DE QUINTILES (AQUÍ ESTÁ LA DIFERENCIA)
-********************************************************************************
-label define q_lab 1 "Q1 (Pobre)" 2 "Q2" 3 "Q3" 4 "Q4" 5 "Q5 (Rico)", replace
+xtile qA_per = wi_A_z [fw=TOTPERS_VIV] if wi_A_z < ., nq(5)
+label values qA_per qwl
+label var qA_per "Quintil A (personas)"
 
-* --- OPCIÓN A: A NIVEL DE PERSONAS (DHS/BM) ---
-* Se usa [fw=TOTPERS_VIV].
-* Interpretación: El Q1 contiene al 20% de la GENTE más pobre.
-cap drop quintil_personas
-xtile quintil_personas = wealth_z [fw=TOTPERS_VIV], nq(5)
-label values quintil_personas q_lab
-label var quintil_personas "Quintil de Riqueza (Ponderado por Población)"
+save "$out\wealth_2012_A_desague.dta", replace
 
-* --- OPCIÓN B: A NIVEL DE HOGARES (Estructural) ---
-* NO se usan pesos.
-* Interpretación: El Q1 contiene al 20% de las CASAS más pobres.
-cap drop quintil_hogares
-xtile quintil_hogares = wealth_z, nq(5)
-label values quintil_hogares q_lab
-label var quintil_hogares "Quintil de Riqueza (Nivel Hogar)"
-
-save "$out\base_hogar_wealth_censo_final.dta", replace
 
 ********************************************************************************
-* 4. EXPORTAR RESULTADOS AGREGADOS (MUNICIPIOS)
+* 3) VERSION B — PCA con SANEAMIENTO MEJORADO (sensibilidad)
+********************************************************************************
+global X_B ///
+    piso_tierra_hog piso_tablon_hog piso_machi_parq_hog piso_mos_cer_hog piso_cemento_hog piso_ladrillo_hog ///
+    techo1_hog techo2_hog techo3_hog techo4_hog ///
+    pared1_hog pared2_hog pared3_hog pared4_hog pared5_hog pared6_hog ///
+    agua_mejorada ///
+    sanit1_hog sanit2_hog ///
+    saneamiento_mejorado ///
+    elec1_hog elec2_hog elec3_hog ///
+    comb_limpio_hog ///
+    radio_hog tv_hog telef_hog comput_hog bici_hog moto_hog vehic_hog cocina_hog carreta_hog bote_hog ///
+    hacin_viv ///
+    ayuda_dom_viv
+
+pca $X_B, corr
+cap drop wi_B_score wi_B_z
+predict wi_B_score if e(sample), score
+egen wi_B_z = std(wi_B_score)
+label var wi_B_z "WI B (PCA corr, saneamiento mejorado, z)"
+
+* Quintiles B (hogares y personas)
+cap drop qB_hog qB_per
+xtile qB_hog = wi_B_z if wi_B_z < ., nq(5)
+label values qB_hog qwl
+label var qB_hog "Quintil B (hogares)"
+
+xtile qB_per = wi_B_z [fw=TOTPERS_VIV] if wi_B_z < ., nq(5)
+label values qB_per qwl
+label var qB_per "Quintil B (personas)"
+
+save "$out\wealth_2012_B_sanemejorado.dta", replace
+
+
+********************************************************************************
+* 4) RESÚMENES MUNICIPALES (A y B) — hogares y personas
 ********************************************************************************
 
-* --- Exportar datos municipales basados en PERSONAS ---
+tempfile munA_hog munA_per munB_hog munB_per
+
+* ===== A: DESAGÜE DESAGREGADO =====
 preserve
-* Promedio ponderado por población
-collapse (mean) riqueza_promedio=wealth_z (count) poblacion=wealth_z [iw=tot_miembros], by(MUN)
-xtile quintil_mun_personas = riqueza_promedio, nq(5)
-label var quintil_mun_personas "Ranking Municipal (Basado en Personas)"
-save "$out\resumen_municipal_personas.dta", replace
+collapse (mean) wiA_mun_hog=wi_A_z (count) n_hogares=wi_A_z, by(MUN)
+xtile q_munA_hog = wiA_mun_hog, nq(5)
+label values q_munA_hog qwl
+save `munA_hog', replace
+save "$out\mun_2012_A_hogares.dta", replace
 restore
 
-* --- Exportar datos municipales basados en HOGARES ---
 preserve
-* Promedio simple de hogares
-collapse (mean) riqueza_promedio=wealth_z (count) num_hogares=wealth_z, by(MUN)
-xtile quintil_mun_hogares = riqueza_promedio, nq(5)
-label var quintil_mun_hogares "Ranking Municipal (Basado en Hogares)"
-save "$out\resumen_municipal_hogares.dta", replace
+collapse (mean) wiA_mun_per=wi_A_z [fw=TOTPERS_VIV] ///
+         (sum) poblacion=TOTPERS_VIV ///
+         (count) n_hogares=wi_A_z, by(MUN)
+xtile q_munA_per = wiA_mun_per, nq(5)
+label values q_munA_per qwl
+save `munA_per', replace
+save "$out\mun_2012_A_personas.dta", replace
 restore
 
+* ===== B: SANEAMIENTO MEJORADO =====
+preserve
+collapse (mean) wiB_mun_hog=wi_B_z (count) n_hogares=wi_B_z, by(MUN)
+xtile q_munB_hog = wiB_mun_hog, nq(5)
+label values q_munB_hog qwl
+save `munB_hog', replace
+save "$out\mun_2012_B_hogares.dta", replace
 restore
 
+preserve
+collapse (mean) wiB_mun_per=wi_B_z [fw=TOTPERS_VIV] ///
+         (sum) poblacion=TOTPERS_VIV ///
+         (count) n_hogares=wi_B_z, by(MUN)
+xtile q_munB_per = wiB_mun_per, nq(5)
+label values q_munB_per qwl
+save `munB_per', replace
+save "$out\mun_2012_B_personas.dta", replace
+restore
+
+
+********************************************************************************
+* 5) Medir cuánto cambia A vs B
+********************************************************************************
+* Correlación entre scores
+corr wi_A_z wi_B_z
+
+* Matriz de cambio de quintil (hogares)
+tab qA_hog qB_hog, row col
+
+* Matriz de cambio de quintil (personas)
+tab qA_per qB_per [fw=TOTPERS_VIV], row col
+
+save "$out\wealth_2012_AB_en_un_archivo.dta", replace
 
 
 
