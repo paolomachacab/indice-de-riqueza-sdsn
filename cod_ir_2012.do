@@ -921,8 +921,8 @@ gen pers_dorm_temp = TOTPERS_VIV / p15_adj
 
 * Dummy: 1=Medio/Alto (hacinamiento), 0=Sin
 gen hacin_ind = .
-replace hacin_ind = 1 if pers_dorm_temp <= 2 & p15_adj > 0
-replace hacin_ind = 0 if pers_dorm_temp > 2 & p15_adj > 0
+replace hacin_ind = 0 if pers_dorm_temp <= 2 & p15_adj > 0
+replace hacin_ind = 1 if pers_dorm_temp > 2 & p15_adj > 0
 
 bys I_BC_VIV: egen hacin_viv = max(hacin_ind)
 drop hacin_ind pers_dorm_temp
@@ -1249,6 +1249,7 @@ tab qA_hog qB_hog, row col
 tab qA_per qB_per [fw=TOTPERS_VIV], row col
 
 save "$out\wealth_2012_AB_en_un_archivo.dta", replace
+
 
 
 
