@@ -65,9 +65,9 @@ save "$out\censo_2012_unido.dta", replace
 * DUMMIES DHS WEALTH INDEX
 * ========================
 ********************************************************************************
-*==================================================================
- * Combinación de variables "Tipos de vivienda "con: Vivienda propia
-*==================================================================
+*===================================================================
+* Combinación de variables "Tipos de vivienda "con: Vivienda propia*
+*====================================================================
 cap drop prop_casa
 gen prop_casa = 0
 replace prop_casa = 1 if P19_TENENCIA == 1 & P01_TIPOVIV == 1
@@ -92,6 +92,138 @@ cap drop prop_viv_local_no_viv
 gen prop_viv_local_no_viv = 0
 replace prop_viv_local_no_viv = 1 if P19_TENENCIA == 1 & P01_TIPOVIV == 5
 tab prop_viv_local_no_viv,m
+
+* Combinación de variables "Tipos de vivienda "con: Vivienda alquilada*
+cap drop alquilada_casa
+gen alquilada_casa = 0
+replace alquilada_casa = 1 if P19_TENENCIA == 2 & P01_TIPOVIV == 1
+tab alquilada_casa,m
+
+cap drop alquilada_depto
+gen alquilada_depto = 0
+replace alquilada_depto = 1 if P19_TENENCIA == 2 & P01_TIPOVIV == 2
+tab alquilada_depto,m
+
+cap drop alquilada_cuarto
+gen alquilada_cuarto = 0
+replace alquilada_cuarto = 1 if P19_TENENCIA == 2 & P01_TIPOVIV == 3
+tab alquilada_cuarto,m
+
+cap drop alquilada_viv_improvisada
+gen alquilada_viv_improvisada = 0
+replace alquilada_viv_improvisada = 1 if P19_TENENCIA == 2 & P01_TIPOVIV == 4
+tab alquilada_viv_improvisada,m
+
+cap drop alquilada_viv_local_no_viv
+gen alquilada_viv_local_no_viv = 0
+replace alquilada_viv_local_no_viv = 1 if P19_TENENCIA == 2 & P01_TIPOVIV == 5
+tab alquilada_viv_local_no_viv,m
+
+* Combinación de variables "Tipos de vivienda "con: Vivienda en contrato anticrético*
+cap drop anticr_casa
+gen anticr_casa = 0
+replace anticr_casa = 1 if P19_TENENCIA == 3 & P01_TIPOVIV == 1
+tab anticr_casa,m
+
+cap drop anticr_depto
+gen anticr_depto = 0
+replace anticr_depto = 1 if P19_TENENCIA == 3 & P01_TIPOVIV == 2
+tab anticr_depto,m
+
+cap drop anticr_cuarto
+gen anticr_cuarto = 0
+replace anticr_cuarto = 1 if P19_TENENCIA == 3 & P01_TIPOVIV == 3
+tab anticr_cuarto,m
+
+cap drop anticr_viv_improvisada
+gen anticr_viv_improvisada = 0
+replace anticr_viv_improvisada = 1 if P19_TENENCIA == 3 & P01_TIPOVIV == 4
+tab anticr_viv_improvisada,m
+
+cap drop anticr_viv_local_no_viv
+gen anticr_viv_local_no_viv = 0
+replace anticr_viv_local_no_viv = 1 if P19_TENENCIA == 3 & P01_TIPOVIV == 5
+tab anticr_viv_local_no_viv,m
+
+* Combinación de variables "Tipos de vivienda "con: Vivienda en contrato anticrético y alquiler*
+cap drop aya_casa
+gen aya_casa = 0
+replace aya_casa = 1 if P19_TENENCIA == 4 & P01_TIPOVIV == 1
+tab aya_casa,m
+
+cap drop aya_depto
+gen aya_depto = 0
+replace aya_depto = 1 if P19_TENENCIA == 4 & P01_TIPOVIV == 2
+tab aya_depto,m
+
+cap drop aya_cuarto
+gen aya_cuarto = 0
+replace aya_cuarto = 1 if P19_TENENCIA == 4 & P01_TIPOVIV == 3
+tab aya_cuarto,m
+
+cap drop aya_viv_improvisada
+gen aya_viv_improvisada = 0
+replace aya_viv_improvisada = 1 if P19_TENENCIA == 4 & P01_TIPOVIV == 4
+tab aya_viv_improvisada,m
+
+cap drop aya_viv_local_no_viv
+gen aya_viv_local_no_viv = 0
+replace aya_viv_local_no_viv = 1 if P19_TENENCIA == 4 & P01_TIPOVIV == 5
+tab aya_viv_local_no_viv,m
+
+* Combinación de variables "Tipos de vivienda "con: Cedida por servicios*
+cap drop ss_casa
+gen ss_casa = 0
+replace ss_casa = 1 if P19_TENENCIA == 5 & P01_TIPOVIV == 1
+tab ss_casa,m
+
+cap ss prop_depto
+gen ss_depto = 0
+replace ss_depto = 1 if P19_TENENCIA == 5 & P01_TIPOVIV == 2
+tab ss_depto,m
+
+cap drop ss_cuarto
+gen ss_cuarto = 0
+replace ss_cuarto = 1 if P19_TENENCIA == 5 & P01_TIPOVIV == 3
+tab ss_cuarto,m
+
+cap drop ss_viv_improvisada
+gen ss_viv_improvisada = 0
+replace ss_viv_improvisada = 1 if P19_TENENCIA == 5 & P01_TIPOVIV == 4
+tab ss_viv_improvisada,m
+
+cap drop ss_viv_local_no_viv
+gen ss_viv_local_no_viv = 0
+replace ss_viv_local_no_viv = 1 if P19_TENENCIA == 5 & P01_TIPOVIV == 5
+tab ss_viv_local_no_viv,m
+
+* Combinación de variables "Tipos de vivienda ": Prestada por parientes o amigos*
+cap drop prest_casa
+gen prest_casa = 0
+replace prest_casa = 1 if P19_TENENCIA == 6 & P01_TIPOVIV == 1
+tab prest_casa,m
+
+cap drop prest_depto
+gen prest_depto = 0
+replace prest_depto = 1 if P19_TENENCIA == 6 & P01_TIPOVIV == 2
+tab prest_depto,m
+
+cap drop prest_cuarto
+gen prest_cuarto = 0
+replace prest_cuarto = 1 if P19_TENENCIA == 6 & P01_TIPOVIV == 3
+tab prest_cuarto,m
+
+cap drop prest_viv_improvisada
+gen prest_viv_improvisada = 0
+replace prest_viv_improvisada = 1 if P19_TENENCIA == 6 & P01_TIPOVIV == 4
+tab prest_viv_improvisada,m
+
+cap drop prest_viv_local_no_viv
+gen prest_viv_local_no_viv = 0
+replace prest_viv_local_no_viv = 1 if P19_TENENCIA == 6 & P01_TIPOVIV == 5
+tab prest_viv_local_no_viv,m
+
+
 
 
 
@@ -648,6 +780,30 @@ label values ayuda_dom_viv binlab
 label var ayuda_dom_viv "Vivienda con ayuda doméstica (dummy)"
 tab ayuda_dom_viv, m
 
+*========================================================
+* 13) BASURA  P16_BASURA          (sin missings)
+*========================================================
+cap drop recol_basura
+gen recol_basura = (P16_BASURA==1 | P16_BASURA==2) if !missing(P16_BASURA)
+label var recol_basura "Vivienda con ayuda doméstica (dummy)"
+tab recol_basura, m
+
+cap drop norecol_basura
+gen norecol_basura = inlist(P16_BASURA,3,4,5,6,7) if !missing(P16_BASURA)
+label var norecol_basura "Vivienda con ayuda doméstica (dummy)"
+tab norecol_basura, m
+
+*========================================================
+* 14) REVOQUE EN PARED INTERIOR: P04_REVOQ (sin missings)
+*========================================================
+cap drop revoque_hog
+gen revoque_ind = .
+replace revoque_ind = 1 if P04_REVOQ==1
+replace revoque_ind = 0 if !missing(P04_REVOQ) & P04_REVOQ!=1
+bys I_BC_VIV: egen revoque_hog = max(revoque_ind)
+drop revoque_ind
+label var revoque_hog "Revoque:  (dummy)"
+tab revoque_hog, m
 
 *******************************************************************************
 * NORMALIZACIÓN DE VARIABLES GEOGRÁFICAS 
@@ -921,6 +1077,45 @@ tab qA_per qB_per [fw=TOTPERS_VIV], row col
 
 save "$out\wealth_2012_AB_en_un_archivo.dta", replace
 
+
+´*******************************************************************************
+* VALIDEZ INTERNA
+*******************************************************************************
+use "$out\base_hogar_wealth_2012_con_pca.dta", clear
+
+foreach var in $X_wealth {
+    tab q_wealth `var', row nofreq
+}
+
+* por quntiles 
+preserve
+keep if inrange(q_wealth,1,5)
+keep q_wealth $X_wealth
+
+collapse (mean) $X_wealth, by (q_wealth)
+
+foreach var in $X_wealth {
+    replace `var' = `var' * 100
+}
+
+drop q_wealth
+
+xpose, clear varname 
+
+rename v1 Quintil1
+rename v2 Quintil2
+rename v3 Quintil3
+rename v4 Quintil4
+rename v5 Quintil5
+rename _varname Variable
+
+format Quintil1-Quintil5 %6.2f
+list, clean
+
+* Guardar en una tabla
+export excel using "C:\Bruna\sdsn\_tbl\validez_interna.acp1.xlsx", firstrow(variables) replace
+
+restore
 
 
 
